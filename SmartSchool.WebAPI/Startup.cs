@@ -25,6 +25,11 @@ namespace SmartSchool.WebAPI
                 context.UseSqlite(Configuration.GetConnectionString("Default"))
             );
 
+            
+            //services.AddSingleton<IRepository, Repository>();
+            //services.AddTransient<IRepository, Repository>();
+            services.AddScoped<IRepository, Repository>();
+
             services.AddControllers();
 
             services.AddSwaggerGen(c =>

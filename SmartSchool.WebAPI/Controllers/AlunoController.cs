@@ -12,9 +12,17 @@ namespace SmartSchool.WebAPI.Controllers
     public class AlunoController : ControllerBase
     {
         private readonly SmartContext _context;
-        public AlunoController(SmartContext context) 
+        public readonly IRepository _repo;
+        public AlunoController(SmartContext context, IRepository repo)
         {
+            _repo = repo;
             _context = context;
+        }
+
+        [HttpGet("pegaResposta")]
+        public IActionResult GetPegaResposta()
+        {
+            return Ok("");
         }
 
         [HttpGet]
@@ -90,8 +98,8 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPost]
         public IActionResult Post(Aluno aluno)
         {
-            _context.Add(aluno);
-            _context.SaveChanges();
+            _repo.Add(aluno);
+            _repo.SaveChanges();
             return Ok(aluno);
         }
 
@@ -140,7 +148,7 @@ namespace SmartSchool.WebAPI.Controllers
                 _context.SaveChanges();
                 return Ok();
             }
-            
+
             return BadRequest("O aluno não foi encontrado");
         }
     }
