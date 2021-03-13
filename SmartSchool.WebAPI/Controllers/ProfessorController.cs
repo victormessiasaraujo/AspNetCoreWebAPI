@@ -11,8 +11,11 @@ namespace SmartSchool.WebAPI.Controllers
     public class ProfessorController : ControllerBase
     {
         private readonly SmartContext _context;
-        public ProfessorController(SmartContext context)
+        private readonly IRepository _repo;
+
+        public ProfessorController(SmartContext context, IRepository repo)
         {
+            _repo = repo;
             _context = context;
         }
 
@@ -55,7 +58,7 @@ namespace SmartSchool.WebAPI.Controllers
         //passando parametro por rota
         //api/professor/Maria
         [HttpGet("{nome}")]
-        public IActionResult GetByNome (string nome)
+        public IActionResult GetByNome(string nome)
         {
             var professor = _context.Professores.Where(p => p.Nome.Equals(nome));
 
@@ -74,7 +77,7 @@ namespace SmartSchool.WebAPI.Controllers
         {
             var professor = _context.Professores.Where(p => p.Nome.Contains(nome));
 
-            if(professor == null)
+            if (professor == null)
             {
                 return BadRequest("Professor não encontrado");
             }
@@ -87,9 +90,14 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPost]
         public IActionResult Post(Professor professor)
         {
-            _context.Add(professor);
-            _context.SaveChanges();
-            return Ok(professor);
+            _repo.Add(professor);
+
+            if (_repo.SaveChanges())
+            {
+                return Ok(professor);
+            }
+
+            return BadRequest("Professor não encontrado");
         }
 
         [HttpPut("{id}")]
@@ -99,9 +107,14 @@ namespace SmartSchool.WebAPI.Controllers
 
             if (prof != null)
             {
-                _context.Update(professor);
-                _context.SaveChanges();
-                return Ok(professor);
+                _repo.Update(professor);
+
+                if (_repo.SaveChanges())
+                {
+                    return Ok(professor);
+                }
+
+                return BadRequest("Professor não atualizado");
             }
 
             return BadRequest("O professor não foi encontrado");
@@ -114,11 +127,16 @@ namespace SmartSchool.WebAPI.Controllers
 
             if (prof != null)
             {
-                _context.Update(professor);
-                _context.SaveChanges();
-                return Ok(professor);
+                _repo.Update(professor);
+
+                if (_repo.SaveChanges())
+                {
+                    return Ok(professor);
+                }
+
+                return BadRequest("Professor não atualizado");
             }
-            
+
             return BadRequest("O professor não foi encontrado");
         }
 
@@ -129,11 +147,16 @@ namespace SmartSchool.WebAPI.Controllers
 
             if (prof != null)
             {
-                _context.Remove(prof);
-                _context.SaveChanges();
-                return Ok();
+                _repo.Delete(prof);
+
+                if (_repo.SaveChanges())
+                {
+                    return Ok("Professor deletado com SUCESSO");
+                }
+
+                return BadRequest("Professor não deletado");
             }
-            
+
             return BadRequest("O professor não foi encontrado");
         }
     }

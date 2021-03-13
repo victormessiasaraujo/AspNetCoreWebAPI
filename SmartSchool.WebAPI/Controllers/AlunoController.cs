@@ -11,32 +11,25 @@ namespace SmartSchool.WebAPI.Controllers
     [Route("api/[controller]")]
     public class AlunoController : ControllerBase
     {
-        private readonly SmartContext _context;
         public readonly IRepository _repo;
-        public AlunoController(SmartContext context, IRepository repo)
+        public AlunoController(IRepository repo)
         {
             _repo = repo;
-            _context = context;
-        }
-
-        [HttpGet("pegaResposta")]
-        public IActionResult GetPegaResposta()
-        {
-            return Ok("");
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Alunos);
+            var result = _repo.GetAllAlunos(true);
+            return Ok(result);
         }
 
         //passando parametro por rota
         //api/aluno/1
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _repo.GetAllAlunoById(id, false);
 
             if (aluno == null)
             {
@@ -51,7 +44,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpGet("byId")]
         public IActionResult GetByIdQuerystring(int id)
         {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _repo.GetAllAlunoById(id, true);
 
             if (aluno == null)
             {
@@ -61,37 +54,37 @@ namespace SmartSchool.WebAPI.Controllers
             return Ok(aluno);
         }
 
-        //passando parametro por rota
-        //api/aluno/Maria
-        [HttpGet("{nome}")]
-        public IActionResult GetByNome(string nome)
-        {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome));
+        // //passando parametro por rota
+        // //api/aluno/Maria
+        // [HttpGet("{nome}")]
+        // public IActionResult GetByNome(string nome)
+        // {
+        //     var aluno = _context.Alunos.FirstOrDefault(a => a.Nome.Contains(nome));
 
-            if (aluno == null)
-            {
-                return BadRequest("O aluno não foi encontrado");
-            }
+        //     if (aluno == null)
+        //     {
+        //         return BadRequest("O aluno não foi encontrado");
+        //     }
 
-            return Ok(aluno);
-        }
+        //     return Ok(aluno);
+        // }
 
-        //passando parametro por queryString
-        //api/aluno/ByName?nome=Maria&sobrenome=Julia
-        [HttpGet("ByName")]
-        public IActionResult GetByNomeQueryString(string nome, string sobrenome)
-        {
-            var aluno = _context.Alunos.FirstOrDefault(a =>
-                a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome)
-            );
+        // //passando parametro por queryString
+        // //api/aluno/ByName?nome=Maria&sobrenome=Julia
+        // [HttpGet("ByName")]
+        // public IActionResult GetByNomeQueryString(string nome, string sobrenome)
+        // {
+        //     var aluno = _context.Alunos.FirstOrDefault(a =>
+        //         a.Nome.Contains(nome) && a.Sobrenome.Contains(sobrenome)
+        //     );
 
-            if (aluno == null)
-            {
-                return BadRequest("O aluno não foi encontrado");
-            }
+        //     if (aluno == null)
+        //     {
+        //         return BadRequest("O aluno não foi encontrado");
+        //     }
 
-            return Ok(aluno);
-        }
+        //     return Ok(aluno);
+        // }
 
         //Salvar novo registro
         //api/aluno
@@ -99,8 +92,13 @@ namespace SmartSchool.WebAPI.Controllers
         public IActionResult Post(Aluno aluno)
         {
             _repo.Add(aluno);
-            _repo.SaveChanges();
-            return Ok(aluno);
+
+            if (_repo.SaveChanges()) 
+            { 
+                return Ok(aluno); 
+            }
+            
+            return BadRequest("Aluno não encontrado");
         }
 
         //Atualizar registro
@@ -108,13 +106,18 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, Aluno aluno)
         {
-            var alu = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var alu = _repo.GetAllAlunoById(id);
 
             if (alu != null)
             {
-                _context.Update(aluno);
-                _context.SaveChanges();
-                return Ok(aluno);
+                _repo.Update(aluno);
+
+                if (_repo.SaveChanges()) 
+                { 
+                    return Ok(aluno); 
+                }
+                
+                return BadRequest("Aluno não foi atualizado");
             }
 
             return BadRequest("O aluno não foi encontrado");
@@ -124,13 +127,18 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, Aluno aluno)
         {
-            var alu = _context.Alunos.AsNoTracking().FirstOrDefault(a => a.Id == id);
+            var alu = _repo.GetAllAlunoById(id);
 
             if (alu != null)
             {
-                _context.Update(aluno);
-                _context.SaveChanges();
-                return Ok(value: aluno);
+                _repo.Update(aluno);
+
+                if (_repo.SaveChanges()) 
+                { 
+                    return Ok(aluno); 
+                }
+                
+                return BadRequest("Aluno não foi atualizado");
             }
 
             return BadRequest("O aluno não foi encontrado");
@@ -140,13 +148,18 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var aluno = _context.Alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = _repo.GetAllAlunoById(id);
 
             if (aluno != null)
             {
-                _context.Remove(aluno);
-                _context.SaveChanges();
-                return Ok();
+                _repo.Delete(aluno);
+
+                if (_repo.SaveChanges()) 
+                { 
+                    return Ok("Aluno deletado com SUCESSO"); 
+                }
+                
+                return BadRequest("Aluno não foi deletado");
             }
 
             return BadRequest("O aluno não foi encontrado");
