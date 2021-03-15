@@ -10,19 +10,17 @@ namespace SmartSchool.WebAPI.Controllers
     [Route("api/[controller]")]
     public class ProfessorController : ControllerBase
     {
-        private readonly SmartContext _context;
         private readonly IRepository _repo;
 
-        public ProfessorController(SmartContext context, IRepository repo)
+        public ProfessorController(IRepository repo)
         {
             _repo = repo;
-            _context = context;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_context.Professores);
+            return Ok(_repo.GetAllProfessores(true));
         }
 
         //passando parametro por rota
@@ -30,7 +28,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            var professor = _context.Professores.Where(p => p.Id == id).FirstOrDefault();
+            var professor = _repo.GetAllProfessorById(id, false);
 
             if (professor == null)
             {
@@ -45,7 +43,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpGet("byId")]
         public IActionResult GetByIdQueryString(int id)
         {
-            var professor = _context.Professores.FirstOrDefault(p => p.Id == id);
+            var professor = _repo.GetAllProfessorById(id, false);
 
             if (professor == null)
             {
@@ -55,35 +53,35 @@ namespace SmartSchool.WebAPI.Controllers
             return Ok(professor);
         }
 
-        //passando parametro por rota
-        //api/professor/Maria
-        [HttpGet("{nome}")]
-        public IActionResult GetByNome(string nome)
-        {
-            var professor = _context.Professores.Where(p => p.Nome.Equals(nome));
+        // //passando parametro por rota
+        // //api/professor/Maria
+        // [HttpGet("{nome}")]
+        // public IActionResult GetByNome(string nome)
+        // {
+        //     var professor = _context.Professores.Where(p => p.Nome.Equals(nome));
 
-            if (professor == null)
-            {
-                return BadRequest("Professor não encontrado");
-            }
+        //     if (professor == null)
+        //     {
+        //         return BadRequest("Professor não encontrado");
+        //     }
 
-            return Ok(professor);
-        }
+        //     return Ok(professor);
+        // }
 
-        //passando parametro por queryString
-        //api/aluno/ByName?nome=Maria
-        [HttpGet("ByName")]
-        public IActionResult GetByNomeQueryString(string nome)
-        {
-            var professor = _context.Professores.Where(p => p.Nome.Contains(nome));
+        // //passando parametro por queryString
+        // //api/aluno/ByName?nome=Maria
+        // [HttpGet("ByName")]
+        // public IActionResult GetByNomeQueryString(string nome)
+        // {
+        //     var professor = _context.Professores.Where(p => p.Nome.Contains(nome));
 
-            if (professor == null)
-            {
-                return BadRequest("Professor não encontrado");
-            }
+        //     if (professor == null)
+        //     {
+        //         return BadRequest("Professor não encontrado");
+        //     }
 
-            return Ok(professor);
-        }
+        //     return Ok(professor);
+        // }
 
         //Salvar novo registro
         //api/professor
@@ -103,7 +101,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, Professor professor)
         {
-            var prof = _context.Professores.Where(p => p.Id == id).AsNoTracking().FirstOrDefault();
+            var prof = _repo.GetAllProfessorById(id, false);
 
             if (prof != null)
             {
@@ -123,8 +121,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, Professor professor)
         {
-            var prof = _context.Professores.AsNoTracking().FirstOrDefault(p => p.Id == id);
-
+            var prof = _repo.GetAllProfessorById(id, false);
             if (prof != null)
             {
                 _repo.Update(professor);
@@ -143,7 +140,7 @@ namespace SmartSchool.WebAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var prof = _context.Professores.AsNoTracking().FirstOrDefault(p => p.Id == id);
+            var prof = _repo.GetAllProfessorById(id);
 
             if (prof != null)
             {

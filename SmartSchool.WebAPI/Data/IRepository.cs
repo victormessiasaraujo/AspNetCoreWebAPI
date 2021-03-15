@@ -16,7 +16,7 @@ namespace SmartSchool.WebAPI.Data
 
         public Professor[] GetAllProfessores(bool preencheObjetoCompleto = false);
 
-        public Professor[] GetAllAProfessoresByDisciplinaId(int disciplinaId, bool preencheObjetoCompleto = false);
+        public Professor[] GetAllProfessoresByDisciplinaId(int disciplinaId, bool preencheObjetoCompleto = false);
 
         public Professor GetAllProfessorById(int professorId, bool preencheObjetoCompleto = false);
     }

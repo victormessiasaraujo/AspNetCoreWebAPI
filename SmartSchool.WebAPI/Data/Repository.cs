@@ -100,7 +100,7 @@ namespace SmartSchool.WebAPI.Data
             return query.ToArray();
         }
 
-        public Professor[] GetAllAProfessoresByDisciplinaId(int disciplinaId, bool preencheObjetoCompleto = false)
+        public Professor[] GetAllProfessoresByDisciplinaId(int disciplinaId, bool preencheObjetoCompleto = false)
         {
             IQueryable<Professor> query = _context.Professores;
 
