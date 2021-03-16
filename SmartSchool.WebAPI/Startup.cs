@@ -30,7 +30,9 @@ namespace SmartSchool.WebAPI
             //services.AddTransient<IRepository, Repository>();
             services.AddScoped<IRepository, Repository>();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(
+                opt => opt.SerializerSettings.ReferenceLoopHandling =
+                       Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddSwaggerGen(c =>
             {
