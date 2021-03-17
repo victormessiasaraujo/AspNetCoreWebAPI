@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartSchool.WebAPI.Data;
+using SmartSchool.WebAPI.Dtos;
 using SmartSchool.WebAPI.Models;
 
 namespace SmartSchool.WebAPI.Controllers
@@ -12,16 +14,19 @@ namespace SmartSchool.WebAPI.Controllers
     public class AlunoController : ControllerBase
     {
         public readonly IRepository _repo;
-        public AlunoController(IRepository repo)
+        private readonly IMapper _mapper;
+        public AlunoController(IRepository repo, IMapper mapper)
         {
+            _mapper = mapper;
             _repo = repo;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var result = _repo.GetAllAlunos(true);
-            return Ok(result);
+            var alunos = _repo.GetAllAlunos(true);
+        
+            return Ok(_mapper.Map<IEnumerable<AlunoDto>>(alunos));
         }
 
         //passando parametro por rota
@@ -93,11 +98,11 @@ namespace SmartSchool.WebAPI.Controllers
         {
             _repo.Add(aluno);
 
-            if (_repo.SaveChanges()) 
-            { 
-                return Ok(aluno); 
+            if (_repo.SaveChanges())
+            {
+                return Ok(aluno);
             }
-            
+
             return BadRequest("Aluno não encontrado");
         }
 
@@ -112,11 +117,11 @@ namespace SmartSchool.WebAPI.Controllers
             {
                 _repo.Update(aluno);
 
-                if (_repo.SaveChanges()) 
-                { 
-                    return Ok(aluno); 
+                if (_repo.SaveChanges())
+                {
+                    return Ok(aluno);
                 }
-                
+
                 return BadRequest("Aluno não foi atualizado");
             }
 
@@ -133,11 +138,11 @@ namespace SmartSchool.WebAPI.Controllers
             {
                 _repo.Update(aluno);
 
-                if (_repo.SaveChanges()) 
-                { 
-                    return Ok(aluno); 
+                if (_repo.SaveChanges())
+                {
+                    return Ok(aluno);
                 }
-                
+
                 return BadRequest("Aluno não foi atualizado");
             }
 
@@ -154,11 +159,11 @@ namespace SmartSchool.WebAPI.Controllers
             {
                 _repo.Delete(aluno);
 
-                if (_repo.SaveChanges()) 
-                { 
-                    return Ok("Aluno deletado com SUCESSO"); 
+                if (_repo.SaveChanges())
+                {
+                    return Ok("Aluno deletado com SUCESSO");
                 }
-                
+
                 return BadRequest("Aluno não foi deletado");
             }
 

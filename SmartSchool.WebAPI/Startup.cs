@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SmartSchool.WebAPI.Data;
+using SmartSchool.WebAPI.Helpers;
 
 namespace SmartSchool.WebAPI
 {
@@ -26,13 +28,22 @@ namespace SmartSchool.WebAPI
             );
 
             
-            //services.AddSingleton<IRepository, Repository>();
-            //services.AddTransient<IRepository, Repository>();
-            services.AddScoped<IRepository, Repository>();
 
             services.AddControllers().AddNewtonsoftJson(
                 opt => opt.SerializerSettings.ReferenceLoopHandling =
                        Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            
+            // var mappingConfig = new MapperConfiguration(mc =>
+            // {
+            //     mc.AddProfile(new SmartSchoolProfile());
+            // });
+
+            // IMapper mapper = mappingConfig.CreateMapper();
+
+            services.AddAutoMapper(typeof(SmartSchoolProfile));
+
+            services.AddScoped<IRepository, Repository>();
 
             services.AddSwaggerGen(c =>
             {
